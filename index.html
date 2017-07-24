@@ -2,8 +2,74 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8"/>
-    <title>Document</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Train Schedule</title>
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <link href="assets/css/style.css" rel="stylesheet"/>
   </head>
-  <body></body>
+  <body>
+    <div class="container">
+      <div class="row">
+	<div class="jumbotron">
+	  <h1>Anytime is Train Time</h1>
+	  <p>Add your own Train</p>
+	</div>
+      </div>
+      <div class="row">
+	<div class="panel panel-default">
+	  <div class="panel-heading">
+	    <h3 class="panel-title">Current Train Schedule</h3>
+	  </div>
+	  <table class="table table-striped">
+	    <thead>
+	      <tr>
+		<th>Train Name</th>
+		<th>Destination</th>
+		<th>Frequency(min)</th>
+		<th>Next Arrival</th>
+		<th>Minutes Away</th>
+	      </tr>
+	    </thead>
+	  </table>
+	</div>
+      </div>
+      <div class="row">
+	<div class="panel panel-default">
+	  <div class="panel-heading">
+	    <h3 class="panel-title">Add Train</h3>
+	  </div>
+	  <div class="panel-body">
+	    <form>
+	      <div class="form-group">
+		<label for="trainNameInput">Train Name:</label>
+		<input type="text" class="form-control" id="trainNameInput">
+	      </div>
+	      <div class="form-group">
+		<label for="destinationInput">Destination</label>
+		<input type="text" class="form-control" id="destinationInput">
+	      </div>
+	      <div class="form-group">
+		<label for="trainTimeInput">Train Time (HH:mm - military time)</label>
+		<input type="text" class="form-control" id="trainTimeInput">
+	      </div>
+	      <div class="form-group">
+		<label for="frequencyInput">Frquency (min)</label>
+		<input type="text" class="form-control" id="frequencyInput">
+	      </div>
+	      <button type="submit" class="btn btn-default">Submit</button>
+	    </form>
+	  </div>
+	  
+	</div>
+      </div>
+
+    </div>
+
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <script src="assets/javascript/script.js"></script>
+  </body>
 </html>
 
