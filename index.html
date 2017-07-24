@@ -41,24 +41,24 @@
 	    <h3 class="panel-title">Add Train</h3>
 	  </div>
 	  <div class="panel-body">
-	    <form>
+	    <form id="trainForm">
 	      <div class="form-group">
-		<label for="trainNameInput">Train Name:</label>
-		<input type="text" class="form-control" id="trainNameInput">
+		<label for="trainName">Train Name:</label>
+		<input name="trainName" type="text" class="form-control" id="trainName">
 	      </div>
 	      <div class="form-group">
-		<label for="destinationInput">Destination</label>
-		<input type="text" class="form-control" id="destinationInput">
+		<label for="destination">Destination</label>
+		<input name="destination" type="text" class="form-control" id="destination">
 	      </div>
 	      <div class="form-group">
-		<label for="trainTimeInput">Train Time (HH:mm - military time)</label>
-		<input type="text" class="form-control" id="trainTimeInput">
+		<label for="trainTime">Train Time (HH:mm - military time)</label>
+		<input name="trainTime" type="text" class="form-control" id="trainTime">
 	      </div>
 	      <div class="form-group">
-		<label for="frequencyInput">Frquency (min)</label>
-		<input type="text" class="form-control" id="frequencyInput">
+		<label for="frequency">Frequency (min)</label>
+		<input name="frequency" type="text" class="form-control" id="frequency">
 	      </div>
-	      <button type="submit" class="btn btn-default">Submit</button>
+	      <button type="submit" id="submitBtn" class="btn btn-default">Submit</button>
 	    </form>
 	  </div>
 	  
