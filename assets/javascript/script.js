@@ -1,3 +1,5 @@
+var intervalId;
+var counter = 0;
 function militaryToStandard(militaryTime){
 	//Converts to standard time
 	//First I convert to array, spliting it by the ':'
@@ -72,6 +74,9 @@ var ref = database.ref('trainSchedule');
 //Getting a snapshot of the local data
 // This function allows me to update the page in real-time when the firebase database changes.
 ref.on('value', function(snapshot){
+	//This will stop the active timer
+	//Note it is better to do it here incase there is a change from firebase
+	clearInterval(intervalId);
 	//This empties out schedule
 	$('#trainBody').empty();
 	//Gets current Military Time 
@@ -82,6 +87,22 @@ ref.on('value', function(snapshot){
 	var trainSchedule = snapshot.val();
 	//This will give me an array of all the keys in the javascript object
 	var keys = Object.keys(trainSchedule);
+	function timerMinute() {
+		intervalId = setInterval(updateMinutesAway, 1000*60);
+	}
+	function updateMinutesAway(){
+		$('.minutesAway').remove();
+		currentTime = new Date($.now());
+		actualTime = currentTime.getHours() + ':' + (currentTime.getMinutes()<10?'0':'') + currentTime.getMinutes();
+		for (var j = 0; j <keys.length; j++) {
+			k = keys[j];
+			trainMinutesAway = subtractMilitaryTimesMinutes(trainSchedule[k].trainTime, actualTime);
+			trainDataMinutesAway = $('<td>');
+			$(trainDataMinutesAway).addClass('minutesAway').append(trainMinutesAway);
+			$('#'+j).append(trainDataMinutesAway);
+		}
+	}
+	timerMinute();
 	for (var i = 0; i <keys.length; i++) {
 		var k = keys[i];
 		var trainName = trainSchedule[k].trainName;
@@ -91,6 +112,7 @@ ref.on('value', function(snapshot){
 		var frequency = trainSchedule[k].frequency;
 		var trainMinutesAway = subtractMilitaryTimesMinutes(trainSchedule[k].trainTime, actualTime);
 		var trainRow = $('<tr>');
+		trainRow.attr('id', i);
 		//trainName
 		var trainDataName = $('<td>');
 		$(trainDataName).append(trainName);
@@ -113,7 +135,7 @@ ref.on('value', function(snapshot){
 		$('#trainBody').append(trainRow);
 		//trainMinutes Away
 		var trainDataMinutesAway = $('<td>');
-		$(trainDataMinutesAway).append(trainMinutesAway);
+		$(trainDataMinutesAway).addClass('minutesAway').append(trainMinutesAway);
 		$(trainRow).append(trainDataMinutesAway);
 		$('#trainBody').append(trainRow);
 	}
@@ -121,13 +143,11 @@ ref.on('value', function(snapshot){
 $('#submitBtn').on('click', function(event) {
 	//prevent form from trying to submit
 	event.preventDefault();
+	
 	//Get the input values
 	var trainName = $('#trainName').val().trim();
 	var destination = $('#destination').val().trim();
 	var trainTime = $('#trainTime').val().trim();
-	
-	console.log(trainTime);
-
 	var frequency = $('#frequency').val().trim();
 	//Whenever I submit the form, I create a js object and it has the data that I want
 	var data = {
@@ -141,5 +161,3 @@ $('#submitBtn').on('click', function(event) {
 	ref.push(data);
 	$('#trainForm')[0].reset();
 });
-
-
