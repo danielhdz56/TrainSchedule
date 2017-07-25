@@ -1,3 +1,14 @@
+// Military Time
+$('.timepicker').timepicker({
+    timeFormat: 'hh:mm p',
+    interval: 60,
+    minTime: '00:00',
+    maxTime: '23:59',
+    startTime: '10:00',
+    dynamic: false,
+    dropdown: false,
+    scrollbar: false
+});
 // Initialize Firebase
 var config = {
 	apiKey: "AIzaSyAlK7n7MIDiYtkY6DUFejIibWAX07Vq2Ck",
@@ -27,6 +38,7 @@ ref.on('value', function(snapshot){
 		var destination = trainSchedule[k].destination;
 		var trainTime = trainSchedule[k].trainTime;
 		var frequency = trainSchedule[k].frequency;
+		var trainMinutesAway = trainSchedule[k].trainMinutesAway;
 		var trainRow = $('<tr>');
 		//trainName
 		var trainDataName = $('<td>');
@@ -48,6 +60,11 @@ ref.on('value', function(snapshot){
 		$(trainDataTime).append(trainTime);
 		$(trainRow).append(trainDataTime);
 		$('#trainBody').append(trainRow);
+		//trainTime
+		var trainDataMinutesAway = $('<td>');
+		$(trainDataMinutesAway).append(trainMinutesAway);
+		$(trainRow).append(trainDataMinutesAway);
+		$('#trainBody').append(trainRow);
 	}
 });
 $('#submitBtn').on('click', function(event) {
@@ -68,6 +85,12 @@ $('#submitBtn').on('click', function(event) {
 	//I then access the reference of where I am going to place that data
 	var ref = database.ref('trainSchedule');
 	ref.push(data);
+	$('#trainForm')[0].reset();
+
+	var d = new Date();
+	var n = d.getHours() + ":" + d.getMinutes();
+	console.log(n)
+
 });
 
 
