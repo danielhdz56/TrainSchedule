@@ -1,6 +1,53 @@
-// Military Time
+function militaryToStandard(militaryTime){
+	//Converts to standard time
+	//First I convert to array, spliting it by the ':'
+	var militaryTimeArr = militaryTime.split(':');
+	//I then get indexes that match the hours and minutes
+	var militaryHours = Number(militaryTimeArr[0]);
+	var militaryMinutes = Number(militaryTimeArr[1]);
+	//I make a global variable to use within my if statement
+	var standardTime;
+	if (militaryHours > 0 && militaryHours <= 12) { //do nothing if between 0 and 12 (including 12)
+		if (militaryHours > 0 && militaryHours < 10) {
+			standardTime = "0";
+		}
+		else {
+			standardTime = "";
+		}
+		standardTime += militaryHours;
+	} else if (militaryHours > 12) { //subtract 12 if greater than 12
+		if (militaryHours < 22) {
+			standardTime = "0";
+		}
+		else {
+			standardTime = "";
+		}
+		standardTime += (militaryHours - 12);
+	} else if (militaryHours == 0) { //change to 12 if equals 0 
+	  	standardTime = "12";
+	}
+	standardTime += (militaryMinutes < 10) ? ":0" + militaryMinutes : ":" + militaryMinutes;  // get militaryMinutes
+	standardTime += (militaryHours >= 12) ? " P.M." : " A.M.";  // get AM/PM
+	// show
+	return standardTime;
+}
+function subtractMilitaryTimesMinutes(minuendTime, subtrahendTime){
+	var minuendTimeArr = minuendTime.split(':');
+	var minuendHours = Number(minuendTimeArr[0]);
+	var minuendMinutes = Number(minuendTimeArr[1]);
+	var subtrahendTimeArr = subtrahendTime.split(':');
+	var subtrahendHours = Number(subtrahendTimeArr[0]);
+	var subtrahendMinutes = Number(subtrahendTimeArr[1]);
+	var differenceHours = minuendHours - subtrahendHours;
+	if(minuendHours <= subtrahendHours) {
+		differenceHours = differenceHours + 24;
+	}
+	var differenceMinutes = (minuendMinutes - subtrahendMinutes) + (differenceHours * 60);
+	return differenceMinutes;
+}
+// Transforms user input into military time
 $('.timepicker').timepicker({
-    timeFormat: 'hh:mm p',
+    timeFormat: 'HH:mm',
     interval: 60,
     minTime: '00:00',
     maxTime: '23:59',
@@ -27,18 +74,22 @@ var ref = database.ref('trainSchedule');
 ref.on('value', function(snapshot){
 	//This empties out schedule
 	$('#trainBody').empty();
+	//Gets current Military Time 
+	var currentTime = new Date($.now());
+	//This also handles for a leading zero in the minutes
+	var actualTime = currentTime.getHours() + ':' + (currentTime.getMinutes()<10?'0':'') + currentTime.getMinutes();
 	//This will return an object with all train schedules 
 	var trainSchedule = snapshot.val();
 	//This will give me an array of all the keys in the javascript object
 	var keys = Object.keys(trainSchedule);
-	//makes sure to only update the latest one
 	for (var i = 0; i <keys.length; i++) {
 		var k = keys[i];
 		var trainName = trainSchedule[k].trainName;
 		var destination = trainSchedule[k].destination;
 		var trainTime = trainSchedule[k].trainTime;
+		trainTime = militaryToStandard(trainTime);
 		var frequency = trainSchedule[k].frequency;
-		var trainMinutesAway = trainSchedule[k].trainMinutesAway;
+		var trainMinutesAway = subtractMilitaryTimesMinutes(trainSchedule[k].trainTime, actualTime);
 		var trainRow = $('<tr>');
 		//trainName
 		var trainDataName = $('<td>');
@@ -60,7 +111,7 @@ ref.on('value', function(snapshot){
 		$(trainDataTime).append(trainTime);
 		$(trainRow).append(trainDataTime);
 		$('#trainBody').append(trainRow);
-		//trainTime
+		//trainMinutes Away
 		var trainDataMinutesAway = $('<td>');
 		$(trainDataMinutesAway).append(trainMinutesAway);
 		$(trainRow).append(trainDataMinutesAway);
@@ -74,6 +125,9 @@ $('#submitBtn').on('click', function(event) {
 	var trainName = $('#trainName').val().trim();
 	var destination = $('#destination').val().trim();
 	var trainTime = $('#trainTime').val().trim();
+	
+	console.log(trainTime);
+
 	var frequency = $('#frequency').val().trim();
 	//Whenever I submit the form, I create a js object and it has the data that I want
 	var data = {
@@ -86,11 +140,6 @@ $('#submitBtn').on('click', function(event) {
 	var ref = database.ref('trainSchedule');
 	ref.push(data);
 	$('#trainForm')[0].reset();
-
-	var d = new Date();
-	var n = d.getHours() + ":" + d.getMinutes();
-	console.log(n)
-
 });
 
 
