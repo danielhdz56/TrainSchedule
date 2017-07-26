@@ -1,3 +1,37 @@
+body {
+  background-image: url('../images/green.png'); 
+}
+.jumbotron {
+	background-color: rgba(168, 223, 245, 0.43);
+}
+.panel-default>.panel-heading {
+	background-color: rgba(202, 197, 239, 0.4);
+}
+.table-striped, .panel-body {
+	background-color: rgba(197, 239, 225, 0.52);
+}
+.table>tbody>tr>td {
+	border: none;
+	vertical-align: middle;
+}
+.btn-default {
+	border-color: rgba(51, 51, 51, 0.09);
+}
+.editData, .trashData {
+	text-align: center;
+}
+.editData>.btn-default:hover {
+	background-color: rgba(30, 236, 7, 0.26);
+	border-color: rgba(51, 51, 51, 0.09);
+
+}
+.trashData>.btn-default:hover {
+	background-color: rgba(255, 0, 0, 0.18);
+	border-color: rgba(51, 51, 51, 0.09);
+}
+.panel {
+	border: none;
+}
 .tableData{
 	display: block;
 	padding: 0;
@@ -5,4 +39,10 @@
 	border: 0;
 	width: 100%;
 	background: transparent;
+}
+#submitBtn{
+	background-color: #b8b8ff;
+}
+#submitBtn:hover{
+	background-color: #73fb7e;
 }
