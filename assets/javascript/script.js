@@ -1,7 +1,5 @@
 var intervalId;
 var haveClicked = false;
-
-
 function militaryToStandard(militaryTime){
 	//Converts to standard time
 	//First I convert to array, spliting it by the ':'
@@ -92,7 +90,7 @@ var config = {
 	authDomain: "trainschedule-171f1.firebaseapp.com",
 	databaseURL: "https://trainschedule-171f1.firebaseio.com",
 	projectId: "trainschedule-171f1",
-	storageBucket: "",
+	storageBucket: "trainschedule-171f1.appspot.com",
 	messagingSenderId: "526326343076"
 };
 firebase.initializeApp(config);
