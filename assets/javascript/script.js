@@ -90,7 +90,7 @@ var config = {
 	authDomain: "trainschedule-f8b02.firebaseapp.com",
 	databaseURL: "https://trainschedule-f8b02.firebaseio.com",
 	projectId: "trainschedule-f8b02",
-	storageBucket: "",
+	storageBucket: "trainschedule-f8b02.appspot.com",
 	messagingSenderId: "677528095608"
 };
 firebase.initializeApp(config);
