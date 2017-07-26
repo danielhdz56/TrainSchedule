@@ -120,8 +120,7 @@ limitations under the License.
       // [START authstatelistener]
       firebase.auth().onAuthStateChanged(function(user) {
         if (user) {
-          // User is signed in.
-          window.location = 'https://danielhdz56.github.io/TrainSchedule/index.html';
+          
           var displayName = user.displayName;
           var email = user.email;
           var emailVerified = user.emailVerified;
