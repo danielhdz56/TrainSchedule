@@ -1,4 +1,5 @@
 var intervalId;
+var haveClicked = false;
 
 
 function militaryToStandard(militaryTime){
@@ -49,8 +50,30 @@ function subtractMilitaryTimesMinutes(minuendTime, subtrahendTime){
 	return differenceMinutes;
 }
 $(document).on('click', '.trashBtn', function(){
-	//This deletes the specific key from the database
+	//This allows clients to delete the specific key in firebase
 	ref.child($(this).closest('tr').attr('id')).remove();
+});
+$(document).on('click', '.editBtn', function(){
+	//This allows clients to edit the specific key in firebase
+	//I first get all of the input fields of the row that I want to edit
+	var changes = $(this).closest('tr').children().children('input.tableData');
+	//Create an empty array
+	var data = {};
+	//For each input i am going to get its name and declare that as a property
+	//I am going to define the property with the value
+	$(changes).each(function() {
+		data[$(this).attr("name")] = $(this).val();
+	});
+	ref.child($(this).closest('tr').attr('id')).update(data);
+	haveClicked = false;
+});
+//This changes the next arrival time only when the user hasn't clicked on it
+$(document).on('click', "input[name='trainTime']", function() {
+	//This grabs the input field fron the database and sets it the new time
+	if (haveClicked === false){
+		$(this).val(trainSchedule[$(this).closest('tr').attr('id')].trainTime);
+		haveClicked = true;
+	}
 });
 // Transforms user input into military time
 $('.timepicker').timepicker({
@@ -106,7 +129,7 @@ ref.on('value', function(snapshot){
 			trainDataMinutesAway = $('<td>');
 			$(trainDataMinutesAway).addClass('minutesAway').append(trainMinutesAway);
 
-			$(trainDataMinutesAway).insertBefore($('#'+k).children('.trashData'));
+			$(trainDataMinutesAway).insertBefore($('#'+k).children('.editData'));
 		}
 	}
 	timerMinute();
@@ -122,22 +145,38 @@ ref.on('value', function(snapshot){
 		trainRow.attr('id', keys[i]);
 		//trainName
 		var trainDataName = $('<td>');
-		$(trainDataName).append(trainName);
+		var trainInputName = $('<input>');
+		$(trainDataName).append(trainInputName);
+		$(trainInputName).addClass('tableData');
+		$(trainInputName).attr('name', 'trainName');
+		$(trainInputName).val(trainName);
 		$(trainRow).append(trainDataName);
 		$('#trainBody').append(trainRow);
 		//destination
 		var trainDataDestination = $('<td>');
-		$(trainDataDestination).append(destination);
+		var trainInputDestination = $('<input>');
+		$(trainDataDestination).append(trainInputDestination);
+		$(trainInputDestination).addClass('tableData');
+		$(trainInputDestination).attr('name', 'destination');
+		$(trainInputDestination).val(destination);
 		$(trainRow).append(trainDataDestination);
 		$('#trainBody').append(trainRow);
 		//frequency
 		var trainDataFrequency = $('<td>');
-		$(trainDataFrequency).append(frequency);
+		var trainInputFrequency = $('<input>');
+		$(trainDataFrequency).append(trainInputFrequency);
+		$(trainInputFrequency).addClass('tableData');
+		$(trainInputFrequency).attr('name', 'frequency');
+		$(trainInputFrequency).val(frequency);
 		$(trainRow).append(trainDataFrequency);
 		$('#trainBody').append(trainRow);
 		//trainTime
 		var trainDataTime = $('<td>');
-		$(trainDataTime).append(trainTime);
+		var trainInputTime = $('<input>');
+		$(trainDataTime).append(trainInputTime);
+		$(trainInputTime).addClass('tableData');
+		$(trainInputTime).attr('name', 'trainTime');
+		$(trainInputTime).val(trainTime);
 		$(trainRow).append(trainDataTime);
 		$('#trainBody').append(trainRow);
 		//trainMinutes Away
@@ -145,6 +184,17 @@ ref.on('value', function(snapshot){
 		$(trainDataMinutesAway).addClass('minutesAway').append(trainMinutesAway);
 		$(trainRow).append(trainDataMinutesAway);
 		$('#trainBody').append(trainRow);
+		//table edit button
+		var editData = $('<td>');
+		$(editData).addClass('editData')
+		var editBtn = $('<button>');
+		var editSpan = $('<span>')
+		$(editSpan).addClass('glyphicon glyphicon-pencil');
+		$(editBtn).addClass('btn btn-default editBtn');
+		$(editBtn).attr('type', 'button');
+		$(editBtn).append(editSpan);
+		$(editData).append(editBtn);
+		$(trainRow).append(editData);
 		//table trash button
 		var trashData = $('<td>');
 		$(trashData).addClass('trashData')
@@ -155,7 +205,6 @@ ref.on('value', function(snapshot){
 		$(trashBtn).append(trashSpan);
 		$(trashData).append(trashBtn);
 		$(trainRow).append(trashData);
-
 	}
 });
 $('#submitBtn').on('click', function(event) {
