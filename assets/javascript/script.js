@@ -86,12 +86,12 @@ $('.timepicker').timepicker({
 });
 // Initialize Firebase
 var config = {
-    apiKey: "AIzaSyAlK7n7MIDiYtkY6DUFejIibWAX07Vq2Ck",
-    authDomain: "trainschedule-171f1.firebaseapp.com",
-    databaseURL: "https://trainschedule-171f1.firebaseio.com",
-    projectId: "trainschedule-171f1",
-    storageBucket: "",
-    messagingSenderId: "526326343076"
+	apiKey: "AIzaSyCA4-muvFHMNKuOnxHy-n_GTo0bi7BmoVg",
+	authDomain: "trainschedule-f8b02.firebaseapp.com",
+	databaseURL: "https://trainschedule-f8b02.firebaseio.com",
+	projectId: "trainschedule-f8b02",
+	storageBucket: "",
+	messagingSenderId: "677528095608"
 };
 firebase.initializeApp(config);
 //Creating an instance of firebase to reference
