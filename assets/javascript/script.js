@@ -85,15 +85,16 @@ $('.timepicker').timepicker({
     scrollbar: false
 });
 // Initialize Firebase
-var config = {
-	apiKey: "AIzaSyAlK7n7MIDiYtkY6DUFejIibWAX07Vq2Ck",
-	authDomain: "trainschedule-171f1.firebaseapp.com",
-	databaseURL: "https://trainschedule-171f1.firebaseio.com",
-	projectId: "trainschedule-171f1",
-	storageBucket: "trainschedule-171f1.appspot.com",
-	messagingSenderId: "526326343076"
-};
-firebase.initializeApp(config);
+	var config = {
+	  apiKey: "AIzaSyAlK7n7MIDiYtkY6DUFejIibWAX07Vq2Ck",
+	  authDomain: "trainschedule-171f1.firebaseapp.com",
+	  databaseURL: "https://trainschedule-171f1.firebaseio.com",
+	  projectId: "trainschedule-171f1",
+	  storageBucket: "trainschedule-171f1.appspot.com",
+	  messagingSenderId: "526326343076"
+	};
+    
+    firebase.initializeApp(config);
 //Creating an instance of firebase to reference
 var database = firebase.database();
 var ref = database.ref('trainSchedule');
