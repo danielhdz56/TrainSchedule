@@ -1,5 +1,6 @@
 var intervalId;
-var counter = 0;
+
+
 function militaryToStandard(militaryTime){
 	//Converts to standard time
 	//First I convert to array, spliting it by the ':'
@@ -47,6 +48,10 @@ function subtractMilitaryTimesMinutes(minuendTime, subtrahendTime){
 	var differenceMinutes = (minuendMinutes - subtrahendMinutes) + (differenceHours * 60);
 	return differenceMinutes;
 }
+$(document).on('click', '.trashBtn', function(){
+	//This deletes the specific key from the database
+	ref.child($(this).closest('tr').attr('id')).remove();
+});
 // Transforms user input into military time
 $('.timepicker').timepicker({
     timeFormat: 'HH:mm',
@@ -71,6 +76,7 @@ firebase.initializeApp(config);
 //Creating an instance of firebase to reference
 var database = firebase.database();
 var ref = database.ref('trainSchedule');
+var trainSchedule;
 //Getting a snapshot of the local data
 // This function allows me to update the page in real-time when the firebase database changes.
 ref.on('value', function(snapshot){
@@ -84,7 +90,7 @@ ref.on('value', function(snapshot){
 	//This also handles for a leading zero in the minutes
 	var actualTime = currentTime.getHours() + ':' + (currentTime.getMinutes()<10?'0':'') + currentTime.getMinutes();
 	//This will return an object with all train schedules 
-	var trainSchedule = snapshot.val();
+	trainSchedule = snapshot.val();
 	//This will give me an array of all the keys in the javascript object
 	var keys = Object.keys(trainSchedule);
 	function timerMinute() {
@@ -99,7 +105,8 @@ ref.on('value', function(snapshot){
 			trainMinutesAway = subtractMilitaryTimesMinutes(trainSchedule[k].trainTime, actualTime);
 			trainDataMinutesAway = $('<td>');
 			$(trainDataMinutesAway).addClass('minutesAway').append(trainMinutesAway);
-			$('#'+j).append(trainDataMinutesAway);
+
+			$(trainDataMinutesAway).insertBefore($('#'+k).children('.trashData'));
 		}
 	}
 	timerMinute();
@@ -112,7 +119,7 @@ ref.on('value', function(snapshot){
 		var frequency = trainSchedule[k].frequency;
 		var trainMinutesAway = subtractMilitaryTimesMinutes(trainSchedule[k].trainTime, actualTime);
 		var trainRow = $('<tr>');
-		trainRow.attr('id', i);
+		trainRow.attr('id', keys[i]);
 		//trainName
 		var trainDataName = $('<td>');
 		$(trainDataName).append(trainName);
@@ -138,6 +145,17 @@ ref.on('value', function(snapshot){
 		$(trainDataMinutesAway).addClass('minutesAway').append(trainMinutesAway);
 		$(trainRow).append(trainDataMinutesAway);
 		$('#trainBody').append(trainRow);
+		//table trash button
+		var trashData = $('<td>');
+		$(trashData).addClass('trashData')
+		var trashBtn = $('<button>');
+		var trashSpan = $('<span>')
+		$(trashSpan).addClass('glyphicon glyphicon-trash');
+		$(trashBtn).addClass('btn btn-default trashBtn');
+		$(trashBtn).append(trashSpan);
+		$(trashData).append(trashBtn);
+		$(trainRow).append(trashData);
+
 	}
 });
 $('#submitBtn').on('click', function(event) {
