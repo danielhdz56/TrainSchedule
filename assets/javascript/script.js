@@ -189,7 +189,7 @@ ref.on('value', function(snapshot){
 		$(editData).addClass('editData')
 		var editBtn = $('<button>');
 		var editSpan = $('<span>')
-		$(editSpan).addClass('glyphicon glyphicon-pencil');
+		$(editSpan).addClass('glyphicon glyphicon-floppy-disk');
 		$(editBtn).addClass('btn btn-default editBtn');
 		$(editBtn).attr('type', 'button');
 		$(editBtn).append(editSpan);
