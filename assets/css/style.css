@@ -46,3 +46,10 @@ body {
 #submitBtn:hover{
 	background-color: #73fb7e;
 }
+.highlightForm, .highlightTable {
+	background: rgba(160, 55, 255, 0.55);
+	color: #73fb7e;
+}
+.highlightForm::placeholder, .highlightTable::placeholder {
+  color: white;
+}

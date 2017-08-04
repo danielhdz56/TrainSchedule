@@ -1,5 +1,7 @@
 var intervalId;
 var haveClicked = false;
+var regexTime = /^([01]\d|2[0-3]):?([0-5]\d)$/;
+var regexFrequency = /^[1-9]\d*$/;
 function militaryToStandard(militaryTime){
 	//Converts to standard time
 	//First I convert to array, spliting it by the ':'
@@ -29,7 +31,7 @@ function militaryToStandard(militaryTime){
 	  	standardTime = "12";
 	}
 	standardTime += (militaryMinutes < 10) ? ":0" + militaryMinutes : ":" + militaryMinutes;  // get militaryMinutes
-	standardTime += (militaryHours >= 12) ? " P.M." : " A.M.";  // get AM/PM
+	standardTime += (militaryHours >= 12) ? " PM" : " AM";  // get AM/PM
 	// show
 	return standardTime;
 }
@@ -52,18 +54,58 @@ $(document).on('click', '.trashBtn', function(){
 	ref.child($(this).closest('tr').attr('id')).remove();
 });
 $(document).on('click', '.editBtn', function(){
-	//This allows clients to edit the specific key in firebase
-	//I first get all of the input fields of the row that I want to edit
-	var changes = $(this).closest('tr').children().children('input.tableData');
-	//Create an empty array
-	var data = {};
-	//For each input i am going to get its name and declare that as a property
-	//I am going to define the property with the value
-	$(changes).each(function() {
-		data[$(this).attr("name")] = $(this).val();
-	});
-	ref.child($(this).closest('tr').attr('id')).update(data);
-	haveClicked = false;
+	var isEditValid = true;
+	var isFrequencyNumber = true;
+    $("td input").each(function(){
+        if ($.trim($(this).val()).length == 0){
+            isEditValid = false;
+            $(this).addClass('highlightTable');
+            if($(this).attr("name")==='frequency'){
+            	isFrequencyNumber = false;
+            	$(this).attr('placeholder', 'Please enter a valid integer');
+            }
+            else {
+            	$(this).attr('placeholder', 'Please fill in all fields');
+            }
+        }
+        else{
+            $(this).removeClass('highlightTable').attr('placeholder', '');
+        }
+    });
+    if(!isFrequencyNumber && !isEditValid){
+    	return isFrequencyNumber;
+    	return isEditValid;
+    }
+    else if (!isEditValid){
+    	return isEditValid;
+    }
+    else {
+    	//This allows clients to edit the specific key in firebase
+		//I first get all of the input fields of the row that I want to edit
+		var changes = $(this).closest('tr').children().children('input.tableData');
+		//Create an empty array
+		var data = {};
+		//For each input i am going to get its name and declare that as a property
+		//I am going to define the property with the value
+		$(changes).each(function() {
+			if($(this).attr("name")==='frequency'){
+				if($(this).val().match(regexFrequency)){
+					data[$(this).attr("name")] = $(this).val();
+				}
+				else{
+					$(this).addClass('highlightTable').val('').attr('placeholder', 'Please enter a valid integer');
+				}
+			}
+			else if($(this).attr("name")==='trainTime'){
+				data[$(this).attr("name")] = moment($(this).val(), ["h:mm a"]).format("HH:mm");
+			}
+			else{
+				data[$(this).attr("name")] = $(this).val();
+			}
+		});
+		ref.child($(this).closest('tr').attr('id')).update(data);
+		haveClicked = false;
+    } 
 });
 //This changes the next arrival time only when the user hasn't clicked on it
 $(document).on('click', "input[name='trainTime']", function() {
@@ -125,9 +167,7 @@ ref.on('value', function(snapshot){
 			k = keys[j];
 			trainMinutesAway = subtractMilitaryTimesMinutes(trainSchedule[k].trainTime, actualTime);
 			trainDataMinutesAway = $('<td>');
-			$(trainDataMinutesAway).addClass('minutesAway').append(trainMinutesAway);
-
-			$(trainDataMinutesAway).insertBefore($('#'+k).children('.editData'));
+			$(trainDataMinutesAway).addClass('minutesAway').append(trainMinutesAway).insertBefore($('#'+k).children('.editData'));
 		}
 	}
 	timerMinute();
@@ -145,36 +185,28 @@ ref.on('value', function(snapshot){
 		var trainDataName = $('<td>');
 		var trainInputName = $('<input>');
 		$(trainDataName).append(trainInputName);
-		$(trainInputName).addClass('tableData');
-		$(trainInputName).attr('name', 'trainName');
-		$(trainInputName).val(trainName);
+		$(trainInputName).addClass('tableData').attr('name', 'trainName').val(trainName);
 		$(trainRow).append(trainDataName);
 		$('#trainBody').append(trainRow);
 		//destination
 		var trainDataDestination = $('<td>');
 		var trainInputDestination = $('<input>');
 		$(trainDataDestination).append(trainInputDestination);
-		$(trainInputDestination).addClass('tableData');
-		$(trainInputDestination).attr('name', 'destination');
-		$(trainInputDestination).val(destination);
+		$(trainInputDestination).addClass('tableData').attr('name', 'destination').val(destination);
 		$(trainRow).append(trainDataDestination);
 		$('#trainBody').append(trainRow);
 		//frequency
 		var trainDataFrequency = $('<td>');
 		var trainInputFrequency = $('<input>');
 		$(trainDataFrequency).append(trainInputFrequency);
-		$(trainInputFrequency).addClass('tableData');
-		$(trainInputFrequency).attr('name', 'frequency');
-		$(trainInputFrequency).val(frequency);
+		$(trainInputFrequency).addClass('tableData').attr('name', 'frequency').attr('type', 'number').val(frequency);
 		$(trainRow).append(trainDataFrequency);
 		$('#trainBody').append(trainRow);
 		//trainTime
 		var trainDataTime = $('<td>');
 		var trainInputTime = $('<input>');
 		$(trainDataTime).append(trainInputTime);
-		$(trainInputTime).addClass('tableData');
-		$(trainInputTime).attr('name', 'trainTime');
-		$(trainInputTime).val(trainTime);
+		$(trainInputTime).addClass('tableData').attr('name', 'trainTime').val(trainTime);
 		$(trainRow).append(trainDataTime);
 		$('#trainBody').append(trainRow);
 		//trainMinutes Away
@@ -184,45 +216,67 @@ ref.on('value', function(snapshot){
 		$('#trainBody').append(trainRow);
 		//table edit button
 		var editData = $('<td>');
-		$(editData).addClass('editData')
 		var editBtn = $('<button>');
 		var editSpan = $('<span>')
 		$(editSpan).addClass('glyphicon glyphicon-floppy-disk');
-		$(editBtn).addClass('btn btn-default editBtn');
-		$(editBtn).attr('type', 'button');
-		$(editBtn).append(editSpan);
-		$(editData).append(editBtn);
+		$(editBtn).addClass('btn btn-default editBtn').attr('type', 'button').append(editSpan);
+		$(editData).addClass('editData').append(editBtn);
 		$(trainRow).append(editData);
 		//table trash button
 		var trashData = $('<td>');
-		$(trashData).addClass('trashData')
 		var trashBtn = $('<button>');
 		var trashSpan = $('<span>')
 		$(trashSpan).addClass('glyphicon glyphicon-trash');
-		$(trashBtn).addClass('btn btn-default trashBtn');
-		$(trashBtn).append(trashSpan);
-		$(trashData).append(trashBtn);
+		$(trashBtn).addClass('btn btn-default trashBtn').append(trashSpan);
+		$(trashData).addClass('trashData').append(trashBtn);
 		$(trainRow).append(trashData);
 	}
 });
-$('#submitBtn').on('click', function(event) {
-	//prevent form from trying to submit
-	event.preventDefault();
-	
-	//Get the input values
-	var trainName = $('#trainName').val().trim();
-	var destination = $('#destination').val().trim();
-	var trainTime = $('#trainTime').val().trim();
-	var frequency = $('#frequency').val().trim();
-	//Whenever I submit the form, I create a js object and it has the data that I want
-	var data = {
-		trainName: trainName,
-		destination: destination,
-		trainTime: trainTime,
-		frequency: frequency
+
+$("#trainForm").submit(function(event){
+    var isFormValid = true;
+    $(".form-group input").each(function(){
+        if ($.trim($(this).val()).length == 0){
+            isFormValid = false;
+            $(this).addClass('highlightForm');
+            $(this).val('');
+			$(this).attr('placeholder', 'Please fill in all fields');
+        }
+        else{
+        	$(this).removeClass('highlightForm');
+        	$(this).attr('placeholder', '');
+        }
+    });
+    if (!isFormValid){
+    	return isFormValid;
+    } 
+    else{
+    	event.preventDefault();
+    	//Get the input values
+		var trainName = $('#trainName').val().trim();
+		var destination = $('#destination').val().trim();
+		var trainTime = $('#trainTime').val().trim();
+		var frequency = $('#frequency').val().trim();
+		//Whenever I submit the form, I create a js object and it has the data that I want
+		var data = {
+			trainName: trainName,
+			destination: destination,
+			trainTime: trainTime,
+			frequency: frequency
+		}
+		if(trainTime.match(regexTime) && frequency.match(regexFrequency)){
+			//I then access the reference of where I am going to place that data
+			var ref = database.ref('trainSchedule');
+			ref.push(data);
+			$('#trainForm')[0].reset();
+		}
+		else if (!trainTime.match(regexTime)){
+			event.preventDefault();
+			$('#trainTime').val('').attr('placeholder', 'Please enter a valid time in the following form: ##:##').addClass('highlightForm');
+		}
+		else if (!frequency.match(regexFrequency)){
+			event.preventDefault();
+			$('#frequency').val('').attr('placeholder', 'Please enter a valid integer').addClass('highlightForm');
+		}
 	}
-	//I then access the reference of where I am going to place that data
-	var ref = database.ref('trainSchedule');
-	ref.push(data);
-	$('#trainForm')[0].reset();
 });
